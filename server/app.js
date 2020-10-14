@@ -1,5 +1,6 @@
 const express = require('express');
 const Furniture = require('../database-mongodb/Furniture');
+const model = require('./model.js')
 const app = express();
 const path = require('path');
 
@@ -19,50 +20,40 @@ app.get('/api/similarProducts/products/:id', (request, response) => {
 
 app.post('/api/similarProducts/products', (request, response) => {
     //create new id from last id
-    Furniture.find({}).sort({id: -1}).limit(1)
-    .then((res) => {
-      request.body.id = res[0].id + 1;
-      Furniture.create(request.body)
-      .then((result) => {
+    model.createItem(request.body, (result, error) => {
+      if (error) {
+        console.log(error);
+        response.sendStatus(400).end();
+      } else {
         console.log("new entry created", result);
         response.status(201).send("product added")
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-      response.sendStatus(400)
+      }
     })
 })
 
 app.put('/api/similarProducts/products/:id/:name', (request, response) => {
-    debugger;
     var nameString = request.params.name.split('-').join(' ');
     var updates = request.body
-    console.log("body", request.body, "name", nameString);
-        Furniture.updateOne({id: request.params.id, name: nameString}, {
-            name: updates.name,
-            category: updates.category,
-            price: updates.price,
-            rating: updates.rating,
-            imageUrl: updates.imageUrl,
-            onSale: updates.onSale
-        })
-        .then((res) => {
-            console.log("res", res)
-        })
-        .catch((error) => {
-            response.sendStatus(404)
-        });
+    model.updateItem(request.params.id, nameString, updates, (result, error) => {
+        if (error) {
+            console.log(error);
+            response.sendStatus(404).end();
+        } else {
+            console.log("item update result: ", result);
+            response.status(200).send("item updated");
+        }
+    })
 })
 
 app.delete('/api/similarProducts/products/:id', (request, response) => {
-    console.log(request.params);
-    Furniture.deleteMany({id: request.params.id})
-    .then((res) => {
-        response.status(200).send(`deleted similar items for item ${request.params.name}`);
-    })
-    .catch((error) => {
-        response.sendStatus(404);
+    model.deleteSimilarItems(request.params.id, (result, error) => {
+        if (error) {
+            console.log(error);
+            response.sendStatus(400).end();
+        } else {
+            console.log("item delete result: ", result);
+            response.status(200).send(`deleted similar items for item ${request.params.id}`);
+        }
     })
 });
 
