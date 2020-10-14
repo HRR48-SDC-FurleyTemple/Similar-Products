@@ -18,7 +18,22 @@ app.get('/api/similarProducts/products/:id', (request, response) => {
 });
 //app.put()
 //app.put()
-
+app.post('/api/similarProducts/products', (request, response) => {
+    //create new id from last id
+    Furniture.find({}).sort({id: -1}).limit(1)
+    .then((res) => {
+      request.body.id = res[0].id + 1;
+      Furniture.create(request.body)
+      .then((result) => {
+        console.log("new entry created", result);
+        response.status(201).send("product added")
+      })
+    })
+    .catch((error) => {
+      console.log(error);
+      response.sendStatus(400)
+    })
+})
 app.delete('/api/similarProducts/products/:id', (request, response) => {
     console.log(request.params);
     Furniture.deleteMany({id: request.params.id})
@@ -28,7 +43,7 @@ app.delete('/api/similarProducts/products/:id', (request, response) => {
     .catch((error) => {
         response.sendStatus(404);
     })
-})
+});
 
 app.get('/products/:id', (request, response) => {
     response.sendFile(path.join(__dirname, "/../client/dist", "index.html"));
