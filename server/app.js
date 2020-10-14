@@ -16,8 +16,7 @@ app.get('/api/similarProducts/products/:id', (request, response) => {
             response.end(error);
         });
 });
-//app.put()
-//app.put()
+
 app.post('/api/similarProducts/products', (request, response) => {
     //create new id from last id
     Furniture.find({}).sort({id: -1}).limit(1)
@@ -34,6 +33,28 @@ app.post('/api/similarProducts/products', (request, response) => {
       response.sendStatus(400)
     })
 })
+
+app.put('/api/similarProducts/products/:id/:name', (request, response) => {
+    debugger;
+    var nameString = request.params.name.split('-').join(' ');
+    var updates = request.body
+    console.log("body", request.body, "name", nameString);
+        Furniture.updateOne({id: request.params.id, name: nameString}, {
+            name: updates.name,
+            category: updates.category,
+            price: updates.price,
+            rating: updates.rating,
+            imageUrl: updates.imageUrl,
+            onSale: updates.onSale
+        })
+        .then((res) => {
+            console.log("res", res)
+        })
+        .catch((error) => {
+            response.sendStatus(404)
+        });
+})
+
 app.delete('/api/similarProducts/products/:id', (request, response) => {
     console.log(request.params);
     Furniture.deleteMany({id: request.params.id})
