@@ -16,6 +16,19 @@ app.get('/api/similarProducts/products/:id', (request, response) => {
             response.end(error);
         });
 });
+//app.put()
+//app.put()
+
+app.delete('/api/similarProducts/products/:id', (request, response) => {
+    console.log(request.params);
+    Furniture.deleteMany({id: request.params.id})
+    .then((res) => {
+        response.status(200).send(`deleted similar items for item ${request.params.name}`);
+    })
+    .catch((error) => {
+        response.sendStatus(404);
+    })
+})
 
 app.get('/products/:id', (request, response) => {
     response.sendFile(path.join(__dirname, "/../client/dist", "index.html"));
