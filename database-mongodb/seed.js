@@ -6,6 +6,7 @@ const coolImages = require('cool-images');
 //use faker.js to generate random data
 //create 100 copies of sample furniture
 const furnitureArr = [];
+//CM - second loop creates 8 entries for each id (i)
 
 const bulkCreate = () => {
     for (let i = 0; i < 100; i++) {
