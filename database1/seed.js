@@ -1,23 +1,22 @@
 const faker = require('faker');
 const fs = require('fs');
 
-const furnitureArr = [];
-
-
-
-
 //current S3 library holds 101 photos. Will adapt variable when I have more photos.
 const photoLibrarySize = 101;
-//At 1 million there is about 1 second delay to execute function. Plan to seed db in increments of 1m to start --> run createProductEntry to generate 1m, seed db, run createProductEntry again to reach 10m
-//OJO!! if you are going to run this multiple times you need to handle id number
-//let primaryRecWriter = fs.createWriteStream(`primaryRecs/`)
-  //open stream to write csv headers:
-  //products table
-  //id, category
-    //category (living, kitchen, dining, bedroom, bathroom, closet, laundry)
+
+//Creates 1.44 mill records for a category
+//INDEXES/PRODUCT ID's
+    //'living-room': 1 - 1440000,
+    // 'kitchen': 1440000 - 2880000,
+    // 'dining'2880001 - 4320000,
+    // 'bedroom' 4320001 - 5760000,
+    // 'bathroom' 5760001 - 7200000,
+    // 'closet': 7200001 - 8640000,
+    // 'laundry': 8640001 - 10080000
+
 const createProductEntry = (category, indexStart) => {
-  let categoriesWriter = fs.createWriteStream(`csvFiles/categories/${category}.csv`)
-  categoriesWriter.write('productId, price, rating, imageUrl, onSale');
+  let categoriesWriter = fs.createWriteStream(`primary-records/${category}.csv`)
+  categoriesWriter.write('productId, name, category, price, rating, imageUrl, onSale');
   var photoIndex = 1
   for (var i = indexStart; i < indexStart + 1440000; i ++) {
     let values = {
@@ -33,20 +32,11 @@ const createProductEntry = (category, indexStart) => {
     } else {
       photoIndex += 1;
     }
-    let furnitureString = `\n${values.productId}, ${values.price}, ${values.rating}, ${values.imageUrl}, ${values.onSale}`
+    let furnitureString = `\n${values.productId}, ${values.name}, ${category}, ${values.price}, ${values.rating}, ${values.imageUrl}, ${values.onSale}`
     categoriesWriter.write(furnitureString);
-    //furnitureArr.push(sampleFurniture);
   }
-  return furnitureArr;
 }
-
-
-
-//create a csv file path
-//create a file writer function
-//in file writer, create headers for keys
-//in file appender, add object as string with commas to file
-const categories = ['living-room', 'kitchen', 'dining', 'bedroom', 'bathroom', 'closet', 'laundry']
+//loops over each category, invoking createProductEntry for each and incrementing index to the next group of ids
 const generateData = (fileNames) => {
   var index = 1
   for (var i = 0; i < categories.length; i ++){
@@ -54,7 +44,7 @@ const generateData = (fileNames) => {
     index += 1440000;
   }
 }
+const categories = ['living-room', 'kitchen', 'dining', 'bedroom', 'bathroom', 'closet', 'laundry'];
 
 generateData(categories);
 
-//module.exports = seedData;
