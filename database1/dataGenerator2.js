@@ -11,15 +11,15 @@ const max = 14000000;
 
 var i = 1;
 
-//Creates 1.44 mill records for a category
+//Creates 14 mill records, 2 mill for each category
 //INDEXES/PRODUCT ID's
-    //'living-room': 1 - 1440000,
-    // 'kitchen': 1440000 - 2880000,
-    // 'dining'2880001 - 4320000,
-    // 'bedroom' 4320001 - 5760000,
-    // 'bathroom' 5760001 - 7200000,
-    // 'closet': 7200001 - 8640000,
-    // 'laundry': 8640001 - 10080000
+    //'living-room': 1 - 2000000,
+    // 'kitchen': 2000001 - 4000000,
+    // 'dining'4000001 - 6000000,
+    // 'bedroom' 6000001 - 8000000,
+    // 'bathroom' 8000001 - 10000000,
+    // 'closet': 10000001 - 12000000,
+    // 'laundry': 12000001 - 14000000
 
 
 const createProductEntries = () => {
