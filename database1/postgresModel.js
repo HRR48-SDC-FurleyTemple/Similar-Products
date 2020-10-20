@@ -32,6 +32,21 @@ getRange = (id, category) => {
 }
 
 module.exports = {
+  //getAll causes fatal error when fetching all 14000000 + records
+  //added a limit for testing purposes
+  getAll : (req, res) => {
+    const text = `SELECT * FROM products limit 1000`;
+    client.query(text)
+    .then((result) => {
+      res.status(200).send(result.rows)
+    })
+    .catch((err) => {
+      console.error(err.stack);
+      res.sendStatus(400);
+      client.end();
+    })
+  },
+
   getOne : (req, res) => {
     console.log("REQUEST PARAMS:", req.params)
     var productId = req.params.id;
@@ -94,7 +109,7 @@ module.exports = {
     })
   },
 
-  //fix table parameters to accept longer url
+
   update : (req, res) => {
     console.log("request body", req.body);
     const b = req.body;

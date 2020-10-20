@@ -8,8 +8,13 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 app.get('/api/similarProducts/products/:id', (request, response) => {
-  console.log(request.params)
-  pg.getOne(request, response)
+  console.log(request.params);
+  pg.getOne(request, response);
+})
+//GET ALL REQUEST CAUSES FATAL ERROR JS heap out of memory if not limited in model
+app.get('/api/similarProducts/products', (request, response) => {
+  console.log("get allrequest made: ", request.params);
+  pg.getAll(request, response);
 })
 
 app.post('/api/similarProducts/products', (request, response) => {
