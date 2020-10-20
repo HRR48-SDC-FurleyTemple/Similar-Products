@@ -77,7 +77,21 @@ module.exports = {
   },
 
   remove : (req, res) => {
-
+    console.log("DELETE REQUEST PARAMS:", req.params)
+    var productId = req.params.id;
+    const deleteText = `DELETE FROM products WHERE productid = ${productId} RETURNING *`;
+    client.query(deleteText)
+    .then((result) => {
+      const deletedRow = result.rows[0]
+      const message = `${deletedRow.name} removed from db`
+      console.log("deleted row: ", deletedRow);
+      res.status(200).send(message);
+    })
+    .catch((err) => {
+      console.error(err.stack);
+      res.status(404).send('product not found');
+      client.end();
+    })
   },
   update : (req, res) => {
 

@@ -13,10 +13,30 @@ app.get('/api/similarProducts/products/:id', (request, response) => {
 })
 
 app.post('/api/similarProducts/products', (request, response) => {
-  console.log(request.body)
-  //pg.create(request, response);
+  console.log("post", request.body)
+  pg.create(request, response);
+})
+app.delete('/api/similarProducts/products/:id', (request, response) => {
+  console.log("delete", request.params)
+  pg.remove(request, response);
 })
 
+app.put('/api/similarProducts/products', (request, response) => {
+  console.log("put", request.body)
+  //pg.update(request, response);
+})
+
+// app.delete('/api/similarProducts/products/:id', (request, response) => {
+//     model.deleteSimilarItems(request.params.id, (result, error) => {
+//         if (error) {
+//             console.log(error);
+//             response.sendStatus(400).end();
+//         } else {
+//             console.log("item delete result: ", result);
+//             response.status(200).send(`deleted similar items for item ${request.params.id}`);
+//         }
+//     })
+// });
 // app.post('/api/similarProducts/products', (request, response) => {
 //     //create new id from last id
 //     model.createItem(request.body, (result, error) => {
@@ -44,17 +64,7 @@ app.post('/api/similarProducts/products', (request, response) => {
 //     })
 // })
 
-// app.delete('/api/similarProducts/products/:id', (request, response) => {
-//     model.deleteSimilarItems(request.params.id, (result, error) => {
-//         if (error) {
-//             console.log(error);
-//             response.sendStatus(400).end();
-//         } else {
-//             console.log("item delete result: ", result);
-//             response.status(200).send(`deleted similar items for item ${request.params.id}`);
-//         }
-//     })
-// });
+
 
 app.get('/products/:id', (request, response) => {
     response.sendFile(path.join(__dirname, "/../client/dist", "index.html"));
