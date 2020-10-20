@@ -12,7 +12,7 @@ getRange = (id, category) => {
     return 'productid >= 1206001 AND productid <= 14070000';
   } else if (id > 10050000 || category === 'closet') {
     // 'closet': 10050001 - 12060000,
-    return 'productid >= 10050001 AND productid <= 1206000';
+    return 'productid >= 10050001 AND productid <= 12060000';
   } else if (id > 8040000 || category === 'bathroom') {
     // 'bathroom' 8040001 - 10050000,
     return 'productid >= 8040001 AND productid <= 10050000';
@@ -70,18 +70,24 @@ module.exports = {
 
   create : (req, res) => {
     console.log("request body", req.body);
-    const b = req.body
+    const b = req.body;
+    console.log('category, ', b.category);
+    //const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
     const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
     client.query(idText)
     .then((result) => {
-    console.log(result.rows[0].max)
-    var productId = result.rows[0].max + 1;
+      console.log("inside request", result.rows)
+      var productId = result.rows[0].max + 1;
       var text = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
       var values = [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale];
       client.query(text, values)
       .then((result) => {
         const message = `${result.rows[0].name} added to products`
         res.status(201).send(message);
+      })
+      .catch(err => {
+        console.error('inside insert query: ', err);
+        res.status(400).send('invalid entry')
       })
     })
     .catch(err => {
