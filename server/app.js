@@ -32,23 +32,6 @@ app.put('/api/similarProducts/products/:id', (request, response) => {
   pg.update(request, response);
 })
 
-
-// app.put('/api/similarProducts/products/:id/:name', (request, response) => {
-//     var nameString = request.params.name.split('-').join(' ');
-//     var updates = request.body
-//     model.updateItem(request.params.id, nameString, updates, (result, error) => {
-//         if (error) {
-//             console.log(error);
-//             response.sendStatus(404).end();
-//         } else {
-//             console.log("item update result: ", result);
-//             response.status(200).send("item updated");
-//         }
-//     })
-// })
-
-
-
 app.get('/products/:id', (request, response) => {
     response.sendFile(path.join(__dirname, "/../client/dist", "index.html"));
 });
