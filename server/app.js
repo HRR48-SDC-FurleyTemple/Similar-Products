@@ -21,34 +21,12 @@ app.delete('/api/similarProducts/products/:id', (request, response) => {
   pg.remove(request, response);
 })
 
-app.put('/api/similarProducts/products', (request, response) => {
-  console.log("put", request.body)
-  //pg.update(request, response);
+app.put('/api/similarProducts/products/:id', (request, response) => {
+  console.log("put replace", request.body);
+  console.log("put item number to replace", request.params);
+  pg.update(request, response);
 })
 
-// app.delete('/api/similarProducts/products/:id', (request, response) => {
-//     model.deleteSimilarItems(request.params.id, (result, error) => {
-//         if (error) {
-//             console.log(error);
-//             response.sendStatus(400).end();
-//         } else {
-//             console.log("item delete result: ", result);
-//             response.status(200).send(`deleted similar items for item ${request.params.id}`);
-//         }
-//     })
-// });
-// app.post('/api/similarProducts/products', (request, response) => {
-//     //create new id from last id
-//     model.createItem(request.body, (result, error) => {
-//       if (error) {
-//         console.log(error);
-//         response.sendStatus(400).end();
-//       } else {
-//         console.log("new entry created", result);
-//         response.status(201).send("product added")
-//       }
-//     })
-// })
 
 // app.put('/api/similarProducts/products/:id/:name', (request, response) => {
 //     var nameString = request.params.name.split('-').join(' ');

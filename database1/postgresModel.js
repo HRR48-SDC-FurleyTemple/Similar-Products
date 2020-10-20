@@ -93,8 +93,34 @@ module.exports = {
       client.end();
     })
   },
-  update : (req, res) => {
 
+  //fix table parameters to accept longer url
+  update : (req, res) => {
+    console.log("request body", req.body);
+    const b = req.body;
+    var productId = req.params.id;
+    //refactor: find b.category id range, check if id is within range
+    const values = [b.name, b.price, b.rating, b.imageUrl, b.onSale, productId]
+    const updateText = `
+      UPDATE products
+      SET name = $1,
+          price = $2,
+          rating = $3,
+          imageurl = $4,
+          onsale = $5
+      WHERE productid = $6
+      RETURNING *`;
+    client.query(updateText, values)
+    .then((result) => {
+      console.log(`updates to ${productId}: name ${result.rows[0].name}, price ${result.rows[0].price}, rating ${result.rows[0].rating}, image ${result.rows[0].imageurl}, sale ${result.rows[0].onsale}`)
+      const message = `product number ${result.rows[0].productid} updated`
+      res.status(201).send(message);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(400).send('invalid entry');
+      client.end();
+    })
   }
 }
 
