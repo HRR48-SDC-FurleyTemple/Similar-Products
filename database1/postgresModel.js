@@ -6,23 +6,23 @@ const client = new Client({
 
 client.connect();
 
-getIdRange = (id) => {
-  if ( id > 12060000) {
-     // 'laundry': 12060001 - 14070000
+getRange = (id, category) => {
+  if (id > 12060000 || category === 'laundry') {
+    // 'laundry': 12060001 - 14070000
     return 'productid >= 1206001 AND productid <= 14070000';
-  } else if (id > 10050000) {
+  } else if (id > 10050000 || category === 'closet') {
     // 'closet': 10050001 - 12060000,
     return 'productid >= 10050001 AND productid <= 1206000';
-  } else if (id > 8040000) {
+  } else if (id > 8040000 || category === 'bathroom') {
     // 'bathroom' 8040001 - 10050000,
     return 'productid >= 8040001 AND productid <= 10050000';
-  } else if (id > 6030000) {
-     // 'bedroom' 6030001 - 8040000,
+  } else if (id > 6030000 || category === 'bedroom') {
+    // 'bedroom' 6030001 - 8040000,
     return 'productid >= 6030001 AND productid <= 8040000';
-  } else if (id > 4020000) {
-     // 'dining'4020001 - 6030000,
+  } else if (id > 4020000 || category === 'dining') {
+    // 'dining'4020001 - 6030000,
     return 'productid >= 4020001 AND productid <= 6030000';
-  } else if (id > 2010000) {
+  } else if (id > 2010000 || category === 'kitchen') {
     // 'kitchen': 2010001 - 4020000,
     return 'productid >= 2010001 AND productid <= 4020000';
   } else {
@@ -33,22 +33,81 @@ getIdRange = (id) => {
 
 module.exports = {
   getOne : (req, res) => {
+    console.log("REQUEST PARAMS:", req.params)
     var productId = req.params.id;
-    var prodPrice = req.body.price;
-    console.log(prodPrice, "req from server")
-    client.query(`SELECT * FROM products WHERE ${getIdRange(productId)} AND price <= ${prodPrice + 50} AND price <= ${prodPrice - 50} LIMIT 8`)
-     .then((result) => {
-       console.log("results of query", result.rows);
-       res.status(200).send(result.rows);
-     })
-     .catch((err) => {
-       console.error(err.stack);
-       client.end();
-     })
-   }
+    const priceText = `SELECT price FROM products WHERE productid = ${productId}`;
+    client.query(priceText)
+    .then((result) => {
+      const price = result.rows[0].price
+      const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price <= ${price - 50} LIMIT 8`;
+      client.query(productsText)
+      .then((result) => {
+        console.log("results of query", result.rows);
+        res.status(200).send(result.rows);
+      })
+    })
+    .catch((err) => {
+      console.error(err.stack);
+      res.status(404).send('product not found');
+      client.end();
+    })
+  },
+
+  create : (req, res) => {
+    console.log("request body", req.body);
+    const b = req.body
+    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
+    client.query(idText)
+    .then((result) => {
+    console.log(result.rows[0].max)
+    var productId = result.rows[0].max + 1;
+      var text = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      var values = [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale];
+      client.query(text, values)
+      .then((result) => {
+        const message = `${result.rows[0].name} added to products`
+        res.status(201).send(message);
+      })
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(400).send('invalid entry');
+      client.end();
+    })
+  },
+
+  remove : (req, res) => {
+
+  },
+  update : (req, res) => {
+
+  }
 }
 
+// const create = (req, res) => {
+//   console.log(req);
+//   const category = 'living';
+//   const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, category)}`;
+//   client.query(idText)
+//   // client.query(`SELECT MAX(productid) FROM products WHERE productid >= 1206001 AND productid <= 14070000`)
+//   .then((result) => {
+//     console.log(result.rows[0].max)
+//     //var b = req.body
+//     var productId = result.rows[0].max + 1;
+//     var text = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+//     //var values = [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale];
+//     const values = [productId, 'bucket', 'bathroom', 20, 3.5, 'http', true]
+//     client.query(text, values)
+//     .then((res) => {
+//       console.log(res.rows[0])
+//     })
+//   })
+//   .catch(err => {
+//     console.error(err)
+//   })
+// }
 
+// create();
   // client
   //   .query("CREATE TABLE product(id SERIAL PRIMARY KEY, name VARCHAR(80), rating REAL, price REAL, sale BOOLEAN, category VARCHAR(80))")
   //   .then(res => console.log(res))

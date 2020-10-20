@@ -8,8 +8,14 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 app.get('/api/similarProducts/products/:id', (request, response) => {
-  pg.getOne(request, response);
-});
+  console.log(request.params)
+  pg.getOne(request, response)
+})
+
+app.post('/api/similarProducts/products', (request, response) => {
+  console.log(request.body)
+  //pg.create(request, response);
+})
 
 // app.post('/api/similarProducts/products', (request, response) => {
 //     //create new id from last id
@@ -50,8 +56,8 @@ app.get('/api/similarProducts/products/:id', (request, response) => {
 //     })
 // });
 
-// app.get('/products/:id', (request, response) => {
-//     response.sendFile(path.join(__dirname, "/../client/dist", "index.html"));
-// });
+app.get('/products/:id', (request, response) => {
+    response.sendFile(path.join(__dirname, "/../client/dist", "index.html"));
+});
 
  module.exports = app;

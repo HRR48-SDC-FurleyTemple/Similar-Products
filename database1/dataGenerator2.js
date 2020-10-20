@@ -5,7 +5,7 @@ const fs = require('fs');
 const photoLibrarySize = 101;
 let dataWriter = fs.createWriteStream(`data/primary-records.csv`);
 
-dataWriter.write('productId, name, category, price, rating, imageUrl, onSale');
+dataWriter.write('productId,name,category,price,rating,imageUrl,onSale');
 //Leaves 10000 ids open per category to avoid having to shift all the product ids when a new one is added
 const max = 14060000;
 
@@ -51,8 +51,8 @@ const createProductEntries = () => {
       price: faker.random.number({min: 20, max: 1000}),
       rating: faker.random.number({min: 1, max: 5, precision: 0.5}),
       imageUrl: `https://cem-sdc.s3.us-east-2.amazonaws.com/ph0t0s/furniture${photoIndex}.jpg`,
-      //onSale: faker.random.boolean(),
-      onSale: faker.random.number({min: 0, max: 1}),
+      onSale: faker.random.boolean(),
+      //onSale: faker.random.number({min: 0, max: 1}),
       category: setCategory(i)
     }
     if (photoIndex === photoLibrarySize) {
@@ -60,7 +60,7 @@ const createProductEntries = () => {
     } else {
       photoIndex += 1;
     }
-    let furnitureString = `\n${values.productId}, ${values.name}, ${values.category}, ${values.price}, ${values.rating}, ${values.imageUrl}, ${values.onSale}`;
+    let furnitureString = `\n${values.productId},${values.name},${values.category},${values.price},${values.rating},${values.imageUrl},${values.onSale}`;
 
     if (i === 2000000 || i === 4010000 || i === 6020000 || i === 8030000 || i === 10040000 || i === 12050000) {
       i += 10001
