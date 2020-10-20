@@ -21,7 +21,7 @@ describe('Server Tests', () => {
 
     test('Server should respond to GET request', () => {
         return request(app)
-          .get('/relatedFurnitures')
+          .get('/api/similarProducts/products/2000000')
           .then(response => {
               expect(response.statusCode).toBe(200);
           });
