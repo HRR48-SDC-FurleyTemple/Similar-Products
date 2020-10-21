@@ -6,10 +6,10 @@ const client = new Client({
 
 client.connect();
 
-getRange = (id, category) => {
+const getRange = (id, category) => {
   if (id > 12060000 || category === 'laundry') {
     // 'laundry': 12060001 - 14070000
-    return 'productid >= 1206001 AND productid <= 14070000';
+    return 'productid >= 12060001 AND productid <= 14070000';
   } else if (id > 10050000 || category === 'closet') {
     // 'closet': 10050001 - 12060000,
     return 'productid >= 10050001 AND productid <= 12060000';
@@ -54,7 +54,7 @@ module.exports = {
     client.query(priceText)
     .then((result) => {
       const price = result.rows[0].price
-      const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price <= ${price - 50} LIMIT 8`;
+      const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price >= ${price - 50} LIMIT 8`;
       client.query(productsText)
       .then((result) => {
         console.log("results of query", result.rows);
@@ -72,7 +72,6 @@ module.exports = {
     console.log("request body", req.body);
     const b = req.body;
     console.log('category, ', b.category);
-    //const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
     const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
     client.query(idText)
     .then((result) => {

@@ -9,25 +9,25 @@ const client = new cass.Client({
 const getRange = (id, category) => {
   if (id > 12060000 || category === 'laundry') {
     // 'laundry': 12060001 - 14070000
-    return [1206001, 14070000];
+    return [12060001, 14070000];
   } else if (id > 10050000 || category === 'closet') {
     // 'closet': 10050001 - 12060000,
-    return 'productid >= 10050001 AND productid <= 12060000';
+    return [10050001, 12060000];
   } else if (id > 8040000 || category === 'bathroom') {
     // 'bathroom' 8040001 - 10050000,
-    return 'productid >= 8040001 AND productid <= 10050000';
+    return [8040001, 10050000];
   } else if (id > 6030000 || category === 'bedroom') {
     // 'bedroom' 6030001 - 8040000,
-    return 'productid >= 6030001 AND productid <= 8040000';
+    return [6030001, 8040000];
   } else if (id > 4020000 || category === 'dining') {
     // 'dining'4020001 - 6030000,
-    return 'productid >= 4020001 AND productid <= 6030000';
+    return [4020001, 6030000];
   } else if (id > 2010000 || category === 'kitchen') {
     // 'kitchen': 2010001 - 4020000,
-    return 'productid >= 2010001 AND productid <= 4020000';
+    return [2010001, 4020000];
   } else {
     //'living-room': 1 - 2010000,
-    return 'productid >= 1 AND productid <= 2010000';
+    return [1, 2010000];
   }
 };
 
@@ -60,14 +60,16 @@ module.exports = {
   },
 
   create : (request, response) => {
-    console.log("post body received in model: ", request.body)
+    //console.log("post body received in model: ", request.body)
+    const b = request.body;
+    console.log('category, ', b.category);
+    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
+    // .then(result => {
 
-    .then(result => {
-
-    })
-    .catch(err => {
-      console.error(err.stack);
-    })
+    // })
+    // .catch(err => {
+    //   console.error(err.stack);
+    // })
   },
 
   remove : (request, response) => {
