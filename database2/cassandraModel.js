@@ -6,40 +6,6 @@ const client = new cass.Client({
   keyspace: 'similar_prod'
 });
 
-const getStartHighest = (category) => {
-  if (category === 'laundry') {
-    return 14060000;
-  } else if (category === 'closet') {
-    return 12050000;
-  } else if (category === 'bathroom') {
-    return 10040000;
-  } else if (category === 'bedroom') {
-    return 8030000;
-  } else if (category === 'dining') {
-    return 6020000;
-  } else if (category === 'kitchen') {
-    return 4010000;
-  } else {
-    return 2000000;
-  }
-};
-
-//  const checkForHighest = (highest) => {
-//   const query = `SELECT productId FROM products WHERE productid = ?`;
-//   return client.execute(query, [highest], {prepare: true})
-//   .then (result => {
-//     if (result.rows[0] !== undefined) {
-//       highest ++;
-//       return checkForHighest(highest);
-//     } else {
-//       return highest;
-//     }
-//   })
-//   .catch (err => {
-//     console.error(err);
-//   })
-// }
-// console.log(checkForHighest(14060000));
 
 const getRange = (id, category) => {
   if (id > 12060000 || category === 'laundry') {
@@ -63,6 +29,24 @@ const getRange = (id, category) => {
   } else {
     //'living-room': 1 - 2010000,
     return [1, 2010000];
+  }
+};
+
+const getCatId = (category) => {
+  if (category === 'laundry') {
+    return 7;
+  } else if (category === 'closet') {
+    return 6;
+  } else if (category === 'bathroom') {
+    return 5;
+  } else if (category === 'bedroom') {
+    return 4;
+  } else if (category === 'dining') {
+    return 3;
+  } else if (category === 'kitchen') {
+    return 2;
+  } else {
+    return 1;
   }
 };
 
@@ -96,31 +80,28 @@ module.exports = {
   create : (request, response) => {
     console.log("post body received in model: ", request.body)
     const b = request.body;
-    let maxId = getStartHighest(b.category);
-    const insertQuery = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const values = [b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale];
-    checkForHighest(maxId)
-    .then(() =>{
-      console.log(maxId, "is still here?")
+    const idQuery = `SELECT productid FROM maxids WHERE category = ? allow filtering`
+    client.execute(idQuery, [b.category], {prepare: true})
+    .then(result => {
+      const rows = result.first();
+      const productId = rows.productid + 1;
+      const catId = getCatId(b.category);
+      const updateQuery = `UPDATE maxids SET productid = ? WHERE id = ?`
+      const insertQuery = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      const queries = [
+        {query: updateQuery, params:[productId, catId]},
+        {query: insertQuery, params: [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale]}
+      ]
+      return client.batch(queries, {prepare: true})
     })
-      // console.log(maxId, "new productId")
-      // values.unshift(productId);
-      // console.log("values", values)
-      // client.execute(insertQuery, values, {prepare: true})
-      // .then(result => {
-      //   console.log("results of insert", result)
-      // })
-      // .catch(err => {
-      //   console.error("callback failed: ", err.stack);
-      // })
-    //)
-    // .then(
-    //   console.log('made it to next query')
-    // )
-    // .catch (err => {
-    //   console.error(err);
-    // })
-    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
+    .then((result) => {
+      console.log("created new product and updated maxIds");
+      response.sendStatus(201)
+    })
+    .catch(err => {
+      console.error("create query failed: ", err.stack);
+      response.sendStatus(400)
+    })
   },
 
   remove : (request, response) => {
@@ -164,48 +145,3 @@ module.exports = {
   }
 }
 
-
-// const getOne = (request, response) => {
-//   //console.log("get params received in model: ", request.params);
-//   //const productId = request.params.id;
-//   const productId = 7;
-//   const query =`SELECT * FROM products WHERE productid = ?`;
-//   client.execute(query, [productId], {prepare: true})
-//   .then(result => {
-//     console.log(result.rows[0])
-//     response.status(200).send(result.rows[0])
-//   })
-//   .catch(err => {
-//     console.error(err.stack);
-//   })
-// }
-// getOne();
-//   .then(() => {
-//       const query = "DROP KEYSPACE similar_prod";
-//       return client.execute(query);
-//     })
-//     .catch((err) => {
-//       console.error('keyspace not defined or other error: ', err);
-//     })
-//     .then((result) => {
-//       console.log('keyspace dropped: ', result);
-//       const query = "CREATE KEYSPACE IF NOT EXISTS similar_prod WITH replication =" + "{'class': 'SimpleStrategy', 'replication_factor': '1'}";
-//       return client.execute(query);
-//     })
-//     .then((result) => {
-//       console.log('keyspace created: ', result);
-//       const query = "CREATE TABLE IF NOT EXISTS similar_prod.products" + "(productId int PRIMARY KEY, name text, category text, price decimal, rating decimal, imageUrl text, onSale boolean)"
-//       return client.execute(query);
-//     })
-//     .then((result) => {
-//       console.log('table created: ', result);
-//       return client.shutdown().then(() => {console.log('connection complete')})
-//     })
-
-//     .catch((err) => {
-//       console.error('Heres the problem: ', err);
-//       return client.shutdown().then(() => { throw err; });
-//     })
-// }
-
-// createProductsKeyspace();
