@@ -10,8 +10,8 @@ app.use(express.json());
 
 app.get('/api/similarProducts/products/:id', (request, response) => {
   console.log(request.params);
-  //pg.getOne(request, response);
-  cass.getOne(request, response);
+  //pg.getSimilarProducts(request, response);
+  cass.getSimilarProducts(request, response);
 })
 
 //GET ALL REQUEST CAUSES FATAL ERROR JS heap out of memory if not limited in model

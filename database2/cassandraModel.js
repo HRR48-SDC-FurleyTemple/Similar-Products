@@ -52,7 +52,7 @@ const getCatId = (category) => {
 
 client.connect();
 module.exports = {
-  getOne : (request, response) => {
+  getSimilarProducts : (request, response) => {
     console.log("get params received in model: ", request.params);
     const productId = request.params.id;
     //const productId = 7;
@@ -79,7 +79,7 @@ module.exports = {
 
   create : (request, response) => {
     console.log("post body received in model: ", request.body)
-    const b = request.body;
+    const reqBody = request.body;
     const idQuery = `SELECT productid FROM maxids WHERE category = ? allow filtering`
     client.execute(idQuery, [b.category], {prepare: true})
     .then(result => {
@@ -90,7 +90,7 @@ module.exports = {
       const insertQuery = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES (?, ?, ?, ?, ?, ?, ?)`;
       const queries = [
         {query: updateQuery, params:[productId, catId]},
-        {query: insertQuery, params: [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale]}
+        {query: insertQuery, params: [productId, reqBody.name, reqBody.category, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale]}
       ]
       return client.batch(queries, {prepare: true})
     })
@@ -123,9 +123,9 @@ module.exports = {
 
   update : (request, response) => {
     console.log("put request body received in model: ", request.body);
-    const b = request.body;
+    const reqBody = request.body;
     var productId = request.params.id;
-    const values = [b.name, b.price, b.rating, b.imageUrl, b.onSale, productId]
+    const values = [reqBody.name, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale, productId]
     const query = `
       UPDATE products
       SET name = ?,

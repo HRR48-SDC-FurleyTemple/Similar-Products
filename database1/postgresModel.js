@@ -1,6 +1,6 @@
 const { Client } = require('pg');
 const client = new Client({
-  user: 'clairemelbourne',
+  user: process.env.DB_USER,
   database: 'similar_prod'
 });
 
@@ -47,7 +47,7 @@ module.exports = {
     })
   },
 
-  getOne : (req, res) => {
+  getSimilarProducts : (req, res) => {
     console.log("REQUEST PARAMS:", req.params)
     var productId = req.params.id;
     const priceText = `SELECT price FROM products WHERE productid = ${productId}`;
@@ -70,16 +70,16 @@ module.exports = {
 
   create : (req, res) => {
     console.log("request body", req.body);
-    const b = req.body;
-    console.log('category, ', b.category);
+    const reqBody = req.body;
+    console.log('category, ', reqBody.category);
     const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
     client.query(idText)
     .then((result) => {
       console.log("inside request", result.rows)
-      var productId = result.rows[0].max + 1;
-      var text = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-      var values = [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale];
-      client.query(text, values)
+      const productId = result.rows[0].max + 1;
+      const insertText = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      const values = [productId, reqBody.name, reqBody.category, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale];
+      client.query(insertText, values)
       .then((result) => {
         const message = `${result.rows[0].name} added to products`
         res.status(201).send(message);
@@ -117,10 +117,10 @@ module.exports = {
 
   update : (req, res) => {
     console.log("request body", req.body);
-    const b = req.body;
+    const reqBody = req.body;
     var productId = req.params.id;
     //refactor: find b.category id range, check if id is within range
-    const values = [b.name, b.price, b.rating, b.imageUrl, b.onSale, productId]
+    const values = [reqBody.name, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale, productId]
     const updateText = `
       UPDATE products
       SET name = $1,
