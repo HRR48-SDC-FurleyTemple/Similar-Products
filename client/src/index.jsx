@@ -45,11 +45,12 @@ class App extends React.Component {
     }
 
     render() {
+        console.log(this.state.items)
         return (
             <div id="BottomCarousel">
                 <Title>Similar Products</Title>
                 <Container>
-                    <Carousel 
+                    <Carousel
                     itemPadding={[10, 19]}
                     breakPoints={this.breakPoints}
                     itemsToShow={4}
