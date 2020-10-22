@@ -72,7 +72,7 @@ module.exports = {
     console.log("request body", req.body);
     const reqBody = req.body;
     console.log('category, ', reqBody.category);
-    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
+    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, reqBody.category)}`;
     client.query(idText)
     .then((result) => {
       console.log("inside request", result.rows)

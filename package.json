@@ -6,10 +6,9 @@
   "scripts": {
     "server-dev": "nodemon server/server.js",
     "react-dev": "webpack -d --watch",
-    "db:setup": "node database-mongodb/seed.js",
-    "seed-db": "node database1/seed.js",
-    "generate-categories": "node database1/dataGenerator.js",
+
     "generate": "node database1/dataGenerator2.js",
+    "postgres-qt": "node database1/pgQueryTests.js",
     "test": "jest --detectOpenHandles"
   },
   "repository": {
