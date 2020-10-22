@@ -1,18 +1,18 @@
 const { Client } = require('pg');
 const client = new Client({
-  user: 'clairemelbourne',
+  user: process.env.DB_USER,
   database: 'similar_prod'
 });
 
 client.connect();
 
-getRange = (id, category) => {
+const getRange = (id, category) => {
   if (id > 12060000 || category === 'laundry') {
     // 'laundry': 12060001 - 14070000
-    return 'productid >= 1206001 AND productid <= 14070000';
+    return 'productid >= 12060001 AND productid <= 14070000';
   } else if (id > 10050000 || category === 'closet') {
     // 'closet': 10050001 - 12060000,
-    return 'productid >= 10050001 AND productid <= 1206000';
+    return 'productid >= 10050001 AND productid <= 12060000';
   } else if (id > 8040000 || category === 'bathroom') {
     // 'bathroom' 8040001 - 10050000,
     return 'productid >= 8040001 AND productid <= 10050000';
@@ -47,14 +47,14 @@ module.exports = {
     })
   },
 
-  getOne : (req, res) => {
+  getSimilarProducts : (req, res) => {
     console.log("REQUEST PARAMS:", req.params)
     var productId = req.params.id;
     const priceText = `SELECT price FROM products WHERE productid = ${productId}`;
     client.query(priceText)
     .then((result) => {
       const price = result.rows[0].price
-      const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price <= ${price - 50} LIMIT 8`;
+      const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price >= ${price - 50} LIMIT 8`;
       client.query(productsText)
       .then((result) => {
         console.log("results of query", result.rows);
@@ -70,18 +70,23 @@ module.exports = {
 
   create : (req, res) => {
     console.log("request body", req.body);
-    const b = req.body
+    const reqBody = req.body;
+    console.log('category, ', reqBody.category);
     const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
     client.query(idText)
     .then((result) => {
-    console.log(result.rows[0].max)
-    var productId = result.rows[0].max + 1;
-      var text = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-      var values = [productId, b.name, b.category, b.price, b.rating, b.imageUrl, b.onSale];
-      client.query(text, values)
+      console.log("inside request", result.rows)
+      const productId = result.rows[0].max + 1;
+      const insertText = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      const values = [productId, reqBody.name, reqBody.category, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale];
+      client.query(insertText, values)
       .then((result) => {
         const message = `${result.rows[0].name} added to products`
         res.status(201).send(message);
+      })
+      .catch(err => {
+        console.error('inside insert query: ', err);
+        res.status(400).send('invalid entry')
       })
     })
     .catch(err => {
@@ -112,10 +117,10 @@ module.exports = {
 
   update : (req, res) => {
     console.log("request body", req.body);
-    const b = req.body;
+    const reqBody = req.body;
     var productId = req.params.id;
     //refactor: find b.category id range, check if id is within range
-    const values = [b.name, b.price, b.rating, b.imageUrl, b.onSale, productId]
+    const values = [reqBody.name, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale, productId]
     const updateText = `
       UPDATE products
       SET name = $1,
