@@ -30,11 +30,6 @@ const getRange = (id, category) => {
   }
 }
 
-const timer = (query) =>{
-  var start = new Date().getTime();
-  query()
-}
-
 const getEight = (productId) => {
   const priceText = `SELECT price FROM products WHERE productid = ${productId}`;
   var start = new Date().getTime();
@@ -47,7 +42,7 @@ const getEight = (productId) => {
   .then((result) => {
     var end = new Date().getTime();
     console.log(
-      `results of get8: ${result.rows}
+      `postgres query for 8 products similar to requested product
       time to complete query: ${end - start} ms`
     );
   })
@@ -64,7 +59,7 @@ const remove = (productId) =>{
     var end = new Date().getTime();
     const deletedRow = result.rows[0]
     console.log(
-      `deleted row: ${deletedRow}
+      `postgres query to delete requested product
       time to complete query: ${end - start} ms`
       );
   })
@@ -73,8 +68,6 @@ const remove = (productId) =>{
   })
 }
 
-
-//post request for closet
 const create = (createObj) =>{
   const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, createObj.category)}`;
   var start = new Date().getTime();
@@ -88,9 +81,8 @@ const create = (createObj) =>{
   })
   .then((result) => {
     var end = new Date().getTime();
-    const message = `${result.rows[0].productid} added to products`
     console.log(
-      `${message}
+      `postgres query to add product
       time to complete query: ${end - start} ms`
       );
   })
@@ -99,12 +91,6 @@ const create = (createObj) =>{
   })
 }
 
-const createValues = {name:'lost snack finder', category: 'laundry', price: 35, rating: 2.5, imageUrl: 'https://cem-sdc.s3.us-east-2.amazonaws.com/ph0t0s/furniture1.jpg', onSale: true}
-
-
-//post request for laundry
-
-//put request for 14030001
 const update = (updateArray) =>{
   const updateText = `
     UPDATE products
@@ -119,9 +105,8 @@ const update = (updateArray) =>{
   client.query(updateText, updateArray)
   .then((result) => {
     var end = new Date().getTime();
-    const message = `product number ${updateArray[5]} updated`
     console.log(
-      `${message}
+      `postgres to update requested product
       time to complete query: ${end - start} ms`
       );
   })
@@ -130,7 +115,9 @@ const update = (updateArray) =>{
   })
 }
 
-const updateValues = ['lost sock finder', 23, 3, 'https://cem-sdc.s3.us-east-2.amazonaws.com/ph0t0s/furniture1.jpg', false, 14056978]
+const createValues = {name:'lost snack finder', category: 'laundry', price: 35, rating: 2.5, imageUrl: 'https://cem-sdc.s3.us-east-2.amazonaws.com/ph0t0s/furniture1.jpg', onSale: true};
+
+const updateValues = ['lost sock finder', 23, 3, 'https://cem-sdc.s3.us-east-2.amazonaws.com/ph0t0s/furniture1.jpg', false, 14056978];
 
 client.connect();
 update(updateValues)

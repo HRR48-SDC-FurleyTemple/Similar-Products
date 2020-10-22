@@ -81,11 +81,11 @@ module.exports = {
     console.log("post body received in model: ", request.body)
     const reqBody = request.body;
     const idQuery = `SELECT productid FROM maxids WHERE category = ? allow filtering`
-    client.execute(idQuery, [b.category], {prepare: true})
+    client.execute(idQuery, [reqBody.category], {prepare: true})
     .then(result => {
       const rows = result.first();
       const productId = rows.productid + 1;
-      const catId = getCatId(b.category);
+      const catId = getCatId(reqBody.category);
       const updateQuery = `UPDATE maxids SET productid = ? WHERE id = ?`
       const insertQuery = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES (?, ?, ?, ?, ?, ?, ?)`;
       const queries = [

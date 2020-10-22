@@ -6,9 +6,9 @@
   "scripts": {
     "server-dev": "nodemon server/server.js",
     "react-dev": "webpack -d --watch",
-
     "generate": "node database1/dataGenerator2.js",
     "postgres-qt": "node database1/pgQueryTests.js",
+    "cass-qt": "node database2/cassQueryTests.js",
     "test": "jest --detectOpenHandles"
   },
   "repository": {
