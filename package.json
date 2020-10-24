@@ -6,10 +6,9 @@
   "scripts": {
     "server-dev": "nodemon server/server.js",
     "react-dev": "webpack -d --watch",
-    "db:setup": "node database-mongodb/seed.js",
-    "seed-db": "node database1/seed.js",
-    "generate-categories": "node database1/dataGenerator.js",
     "generate": "node database1/dataGenerator2.js",
+    "postgres-qt": "node database1/pgQueryTests.js",
+    "cass-qt": "node database2/cassQueryTests.js",
     "test": "jest --detectOpenHandles"
   },
   "repository": {
@@ -34,6 +33,7 @@
     "file-loader": "^6.1.0",
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.7",
+    "newrelic": "^6.13.2",
     "nodemon": "^2.0.4",
     "path": "^0.12.7",
     "pg": "^8.4.1",

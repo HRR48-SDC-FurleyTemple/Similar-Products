@@ -71,14 +71,14 @@ const StarWrapper = styled.div`
 const CarouselItem = (props) => {
     const {item} = props;
     let price;
-    if (!item.onSale) {
+    if (!item.onsale) {
         price = <Price>{item.price}</Price>
     } else {
         price = <OnSale>{item.price}</OnSale>
     }
     return (
         <Item>
-            <Image src={item.imageUrl}/>
+            <Image src={item.imageurl}/>
             <Title> {item.name} </Title>
             <Category> {item.category} </Category>
             {price}

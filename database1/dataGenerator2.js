@@ -79,16 +79,5 @@ const createProductEntries = () => {
   }
 }
 
-const createMaxIdTable = () => {
-  let maxIdWriter = fs.createWriteStream(`data/max-ids.csv`)
-  const categories = ['living', 'kitchen', 'dining', 'bedroom', 'bathroom', 'closet', 'laundry'];
-  const maxIds = [2000000, 4010000, 6020000, 8030000, 10040000, 12050000, 14060000];
-  let csvString = 'id,category,productId\n';
-  for (var i = 0; i < categories.length; i++) {
-    csvString += `${i + 1},${categories[i]},${maxIds[i]}\n`
-  }
-  console.log(csvString)
-  maxIdWriter.write(csvString);
-}
-//createProductEntries();
-createMaxIdTable()
+createProductEntries();
+

@@ -43,7 +43,7 @@ module.exports = {
     .catch((err) => {
       console.error(err.stack);
       res.sendStatus(400);
-      client.end();
+      //client.end();
     })
   },
 
@@ -57,14 +57,14 @@ module.exports = {
       const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price >= ${price - 50} LIMIT 8`;
       client.query(productsText)
       .then((result) => {
-        console.log("results of query", result.rows);
+        console.log(`sending products similar to ${productId}`);
         res.status(200).send(result.rows);
       })
     })
     .catch((err) => {
       console.error(err.stack);
       res.status(404).send('product not found');
-      client.end();
+      //client.end();
     })
   },
 
@@ -72,7 +72,7 @@ module.exports = {
     console.log("request body", req.body);
     const reqBody = req.body;
     console.log('category, ', reqBody.category);
-    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, b.category)}`;
+    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, reqBody.category)}`;
     client.query(idText)
     .then((result) => {
       console.log("inside request", result.rows)
@@ -81,7 +81,7 @@ module.exports = {
       const values = [productId, reqBody.name, reqBody.category, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale];
       client.query(insertText, values)
       .then((result) => {
-        const message = `${result.rows[0].name} added to products`
+        const message = `${result.rows[0].name} added to ${result.rows[0].category}`
         res.status(201).send(message);
       })
       .catch(err => {
@@ -92,7 +92,7 @@ module.exports = {
     .catch(err => {
       console.error(err);
       res.status(400).send('invalid entry');
-      client.end();
+      //client.end();
     })
   },
 
@@ -103,14 +103,14 @@ module.exports = {
     client.query(deleteText)
     .then((result) => {
       const deletedRow = result.rows[0]
-      const message = `${deletedRow.name} removed from db`
+      const message = `${deletedRow.name} removed from ${deletedRow.category}`
       console.log("deleted row: ", deletedRow);
       res.status(200).send(message);
     })
     .catch((err) => {
       console.error(err.stack);
       res.status(404).send('product not found');
-      client.end();
+      //client.end();
     })
   },
 
@@ -139,7 +139,7 @@ module.exports = {
     .catch(err => {
       console.error(err);
       res.status(400).send('invalid entry');
-      client.end();
+      //client.end();
     })
   }
 }
