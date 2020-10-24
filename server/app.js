@@ -1,3 +1,4 @@
+require('newrelic');
 const express = require('express');
 const pg = require('../database1/postgresModel');
 const app = express();
