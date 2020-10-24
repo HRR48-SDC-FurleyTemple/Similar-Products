@@ -6,13 +6,30 @@
 
 
 ## Usage
+> To begin install dependencies: npm install
+>
+> To load seeded database, you will need PostgreSQL installed on your machine.
+>
+> Generate data to a csv file with the following command in the terminal from SimilarProducts root folder : npm run generate
+>
+> Then follow these steps in the psql terminal:
 
-> From root directory:
+>   1. Make db:
+> Copy this into the terminal and enter:
+>
+> CREATE DATABASE similar_prod;
+>
+>   2. Make table:
+> Copy this into the terminal and enter:
+>
+> CREATE TABLE products (productId INT PRIMARY KEY, name VARCHAR(200) NOT NULL, category VARCHAR(200) NOT NULL, price REAL NOT NULL, rating REAL, imageurl VARCHAR(200), onSale BOOLEAN DEFAULT false);
+>
+>   3. Seed table:
+> Copy this into the terminal and enter:
+>
+> COPY products(productid, name, category, price, rating, imageurl, onSale) from '/Users/clairemelbourne/Desktop/ProjectPhase/SDC/SimilarProducts/data/primary-records.csv' DELIMITER ',' CSV HEADER;
 
-> Install dependencies: npm install
-
-
-> Seed mongodb database: npm run db:setup
+To activate development version of site:
 
 > In their own terminals:
 
@@ -22,7 +39,6 @@
 
 > To access in browser, visit http://localhost:3001
 
-All products in the database are designated to a primary product's id. As such, a GET request retrieves all products designated with the primary product. However, a PUT request targets a specific product by the primary product id and the specific product name. 
 
 CRUD operations accessed at the following endpoints:
 

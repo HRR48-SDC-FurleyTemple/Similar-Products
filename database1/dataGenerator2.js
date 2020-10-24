@@ -90,5 +90,5 @@ const createMaxIdTable = () => {
   console.log(csvString)
   maxIdWriter.write(csvString);
 }
-//createProductEntries();
-createMaxIdTable()
+createProductEntries();
+//createMaxIdTable()
