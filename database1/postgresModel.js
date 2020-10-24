@@ -6,30 +6,30 @@ const client = new Client({
 
 client.connect();
 
-const getRange = (id, category) => {
-  if (id > 12060000 || category === 'laundry') {
-    // 'laundry': 12060001 - 14070000
-    return 'productid >= 12060001 AND productid <= 14070000';
-  } else if (id > 10050000 || category === 'closet') {
-    // 'closet': 10050001 - 12060000,
-    return 'productid >= 10050001 AND productid <= 12060000';
-  } else if (id > 8040000 || category === 'bathroom') {
-    // 'bathroom' 8040001 - 10050000,
-    return 'productid >= 8040001 AND productid <= 10050000';
-  } else if (id > 6030000 || category === 'bedroom') {
-    // 'bedroom' 6030001 - 8040000,
-    return 'productid >= 6030001 AND productid <= 8040000';
-  } else if (id > 4020000 || category === 'dining') {
-    // 'dining'4020001 - 6030000,
-    return 'productid >= 4020001 AND productid <= 6030000';
-  } else if (id > 2010000 || category === 'kitchen') {
-    // 'kitchen': 2010001 - 4020000,
-    return 'productid >= 2010001 AND productid <= 4020000';
-  } else {
-    //'living-room': 1 - 2010000,
-    return 'productid >= 1 AND productid <= 2010000';
-  }
-}
+// const getRange = (id, category) => {
+//   if (id > 12060000 || category === 'laundry') {
+//     // 'laundry': 12060001 - 14070000
+//     return 'productid >= 12060001 AND productid <= 14070000';
+//   } else if (id > 10050000 || category === 'closet') {
+//     // 'closet': 10050001 - 12060000,
+//     return 'productid >= 10050001 AND productid <= 12060000';
+//   } else if (id > 8040000 || category === 'bathroom') {
+//     // 'bathroom' 8040001 - 10050000,
+//     return 'productid >= 8040001 AND productid <= 10050000';
+//   } else if (id > 6030000 || category === 'bedroom') {
+//     // 'bedroom' 6030001 - 8040000,
+//     return 'productid >= 6030001 AND productid <= 8040000';
+//   } else if (id > 4020000 || category === 'dining') {
+//     // 'dining'4020001 - 6030000,
+//     return 'productid >= 4020001 AND productid <= 6030000';
+//   } else if (id > 2010000 || category === 'kitchen') {
+//     // 'kitchen': 2010001 - 4020000,
+//     return 'productid >= 2010001 AND productid <= 4020000';
+//   } else {
+//     //'living-room': 1 - 2010000,
+//     return 'productid >= 1 AND productid <= 2010000';
+//   }
+// }
 
 module.exports = {
   //getAll causes fatal error when fetching all 14000000 + records
@@ -50,11 +50,12 @@ module.exports = {
   getSimilarProducts : (req, res) => {
     console.log("REQUEST PARAMS:", req.params)
     var productId = req.params.id;
-    const priceText = `SELECT price FROM products WHERE productid = ${productId}`;
-    client.query(priceText)
+    const conditionsText = `SELECT price, category FROM products WHERE productid = ${productId}`;
+    client.query(conditionsText)
     .then((result) => {
-      const price = result.rows[0].price
-      const productsText = `SELECT * FROM products WHERE ${getRange(productId, null)} AND price <= ${price + 50} AND price >= ${price - 50} LIMIT 8`;
+      const price = result.rows[0].price;
+      const category = result.rows[0].category;
+      const productsText = `SELECT * FROM products WHERE category = ${category} AND price <= ${price + 50} AND price >= ${price - 50} LIMIT 8`;
       client.query(productsText)
       .then((result) => {
         console.log(`sending products similar to ${productId}`);
@@ -70,24 +71,14 @@ module.exports = {
 
   create : (req, res) => {
     console.log("request body", req.body);
-    const reqBody = req.body;
-    console.log('category, ', reqBody.category);
-    const idText = `SELECT MAX(productid) FROM products WHERE ${getRange(null, reqBody.category)}`;
-    client.query(idText)
+    const {name, category, price, rating, imageUrl, onSale} = req.body;
+    console.log(imageUrl, onSale)
+    const insertText = `INSERT INTO products (name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`;
+    const values = [name, category, price, rating, imageUrl, onSale];
+    client.query(insertText, values)
     .then((result) => {
-      console.log("inside request", result.rows)
-      const productId = result.rows[0].max + 1;
-      const insertText = `INSERT INTO products (productid, name, category, price, rating, imageurl, onsale) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-      const values = [productId, reqBody.name, reqBody.category, reqBody.price, reqBody.rating, reqBody.imageUrl, reqBody.onSale];
-      client.query(insertText, values)
-      .then((result) => {
-        const message = `${result.rows[0].name} added to ${result.rows[0].category}`
-        res.status(201).send(message);
-      })
-      .catch(err => {
-        console.error('inside insert query: ', err);
-        res.status(400).send('invalid entry')
-      })
+      const message = `${result.rows[0].name} added to ${result.rows[0].category}`
+      res.status(201).send(message);
     })
     .catch(err => {
       console.error(err);

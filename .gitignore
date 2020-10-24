@@ -2,5 +2,5 @@ node_modules
 bundle.js
 data
 .env
-newrelic.js
-newrelic_agent.log
+newrelic*
+newrelic*
