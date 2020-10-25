@@ -28,13 +28,26 @@ module.exports = {
     const conditionsText = `SELECT price, category FROM products WHERE productid = ${productId}`;
     client.query(conditionsText)
     .then((result) => {
-      const price = result.rows[0].price;
+      const prodPrice = result.rows[0].price;
       const category = result.rows[0].category;
-      const productsText = `SELECT * FROM products WHERE category = ${category} AND price <= ${price + 50} AND price >= ${price - 50} LIMIT 8`;
+      const productsText = `SELECT * FROM products WHERE category = ${category} AND price <= ${prodPrice + 50} AND price >= ${prodPrice - 50} LIMIT 8`;
       client.query(productsText)
       .then((result) => {
+        var rows = result.rows;
+        var products = [];
+        for (var i = 0; i < rows.length; i ++) {
+          let product = {
+            productId: rows[i].productid,
+            imageUrl: rows[i].imageurl,
+            name: rows[i].name,
+            onSale: rows[i].onsale,
+            price: rows[i].price,
+            rating: rows[i].rating
+          }
+          products.push(product);
+        }
         console.log(`sending products similar to ${productId}`);
-        res.status(200).send(result.rows);
+        res.status(200).send(products);
       })
     })
     .catch((err) => {
