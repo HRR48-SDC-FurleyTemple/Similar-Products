@@ -1,7 +1,11 @@
+require('dotenv').config()
 const { Client } = require('pg');
 const client = new Client({
+  host: process.env.DB_HOST,
+  port: process.env.PORT,
   user: process.env.DB_USER,
-  database: 'similar_prod'
+  database: 'similar_prod',
+  password: process.env.DB_PASS
 });
 
 client.connect();
@@ -17,13 +21,12 @@ module.exports = {
     })
     .catch((err) => {
       console.error(err.stack);
-      res.sendStatus(400);
+      res.sendStatus(400).end();
       //client.end();
     })
   },
 
   getSimilarProducts : (req, res) => {
-    console.log("REQUEST PARAMS:", req.params)
     var productId = req.params.id;
     const conditionsText = `SELECT price, category FROM products WHERE productid = ${productId}`;
     client.query(conditionsText)
@@ -64,6 +67,7 @@ module.exports = {
     const values = [name, category, price, rating, imageUrl, onSale];
     client.query(insertText, values)
     .then((result) => {
+
       const message = `${result.rows[0].name} added to ${result.rows[0].category}`
       res.status(201).send(message);
     })

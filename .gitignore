@@ -3,4 +3,4 @@ bundle.js
 data
 .env
 newrelic*
-newrelic*
+Dockerfile

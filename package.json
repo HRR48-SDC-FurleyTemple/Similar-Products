@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server-dev": "nodemon server/server.js",
     "react-dev": "webpack -d --watch",
+    "start": "nodemon server/server.js",
+    "build": "webpack --mode=production",
     "generate": "node database1/dataGenerator2.js",
     "generate2": "node database1/newDG.js",
     "postgres-qt": "node database1/pgQueryTests.js",

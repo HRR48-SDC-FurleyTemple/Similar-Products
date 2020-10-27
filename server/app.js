@@ -9,6 +9,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 app.get('/api/similarProducts/products/:id', (request, response) => {
+  console.log( 'REQUEST PARAMS:', request.params)
   pg.getSimilarProducts(request, response);
 })
 
